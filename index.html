@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حزمة الألعاب السبع</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="online-styles.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- Splash Screen -->
+        <div id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <h1 class="mega-title">حزمة الألعاب السبع</h1>
+                <p class="subtitle">تحدي الذكاء، الحظ، والذاكرة</p>
+                <div class="splash-buttons">
+                    <button class="btn btn-primary btn-large" onclick="app.startApp()">ابدأ اللعب</button>
+                    <button class="btn btn-danger btn-large" onclick="app.exitApp()">خروج</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen hidden">
+            <h1>🎮 قائمة الألعاب</h1>
+            <div class="games-grid">
+                <button class="game-card" onclick="app.selectGame('misere')">
+                    <h2>إكس أو المعكوسة</h2>
+                    <p>من يُكوّن خطاً يخسر!</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('circular')">
+                    <h2>إكس أو الدائرية</h2>
+                    <p>لوحة دائرية غير تقليدية.</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('moving')">
+                    <h2>إكس أو المتحركة</h2>
+                    <p>3 قطع فقط، حركها للفوز.</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('color')">
+                    <h2>إكس أو بالألوان</h2>
+                    <p>اجمع أعلى النقاط للفوز.</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('snakes')">
+                    <h2>السلالم والثعابين</h2>
+                    <p>سباق الحظ المصغر.</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('memory')">
+                    <h2>الذاكرة القاتلة</h2>
+                    <p>اجمع الأزواج وتذكر الأماكن.</p>
+                </button>
+                <button class="game-card" onclick="app.selectGame('ultimate')">
+                    <h2>إكس أو العملاقة</h2>
+                    <p>9 لوحات في لوحة واحدة.</p>
+                </button>
+            </div>
+            <footer>تم التطوير بواسطة يوسف حكيم</footer>
+        </div>
+
+        <!-- Game Setup Screen -->
+        <div id="game-setup" class="screen hidden">
+            <h2 id="setup-title">إعداد اللعبة</h2>
+            <div class="setup-options">
+                <button class="btn btn-primary" onclick="app.startLocalGame()">ضد لاعب آخر (محلي)</button>
+                <button class="btn btn-secondary" onclick="app.showAiDifficulty()">ضد الذكاء الاصطناعي</button>
+                <button class="btn btn-accent" onclick="app.showOnlineSetup()">لعب أونلاين</button>
+            </div>
+
+            <div id="ai-difficulty" class="hidden">
+                <h3>اختر الصعوبة</h3>
+                <button class="btn" onclick="app.startAiGame('easy')">سهل</button>
+                <button class="btn" onclick="app.startAiGame('medium')">متوسط</button>
+                <button class="btn" onclick="app.startAiGame('hard')">صعب</button>
+                <button class="btn btn-back" onclick="app.resetSetup()">رجوع للاختيار</button>
+            </div>
+
+            <div id="online-setup" class="hidden">
+                <h3>(قريباً)اللعب أونلاين</h3>
+
+                <div class="online-section">
+                    <h4>إنشاء غرفة جديدة</h4>
+                    <input type="text" id="p1-name" placeholder="اسمك (المضيف)" class="input-field">
+                    <button class="btn btn-primary" onclick="app.createRoom()">إنشاء غرفة</button>
+                </div>
+
+                <div class="divider">أو</div>
+
+                <div class="online-section">
+                    <h4>انضمام لغرفة</h4>
+                    <input type="text" id="p2-name" placeholder="اسمك (الضيف)" class="input-field">
+                    <input type="text" id="room-code-input" placeholder="رمز الغرفة" class="input-field">
+                    <button class="btn btn-secondary" onclick="app.joinRoom()">انضمام</button>
+                </div>
+
+                <button class="btn btn-back" onclick="app.resetSetup()">رجوع للاختيار</button>
+            </div>
+
+            <button id="main-back-btn" class="btn btn-back" onclick="app.goBack()">رجوع للقائمة</button>
+        </div>
+
+        <!-- Active Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <header>
+                <div class="header-controls">
+                    <button class="btn-small btn-danger" onclick="app.quitGame()">خروج</button>
+                    <button id="restart-btn" class="btn-small btn-action" onclick="app.restartGame()">إعادة</button>
+                </div>
+                <h3 id="game-title">عنوان اللعبة</h3>
+                <div id="game-status">الدور: X</div>
+            </header>
+
+            <div id="game-container">
+                <!-- Game board will be injected here -->
+            </div>
+
+            <!-- "How to Play" Overlay (shown first time) -->
+            <div id="how-to-play" class="modal hidden">
+                <div class="modal-content">
+                    <h3>كيفية اللعب</h3>
+                    <p id="rules-text">...</p>
+                    <button class="btn" onclick="app.closeRules()">فهمت</button>
+                </div>
+            </div>
+
+            <!-- Online Waiting Modal -->
+            <div id="waiting-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>بانتظار المنافس...</h3>
+                    <p>شارك رمز الغرفة مع صديقك:</p>
+                    <div id="room-code-display" class="code-box">---</div>
+                    <button class="btn btn-copy" onclick="app.copyRoomCode()">نسخ الرمز</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/games/misere-ttt.js"></script>
+    <script src="js/games/circular-ttt.js"></script>
+    <script src="js/games/moving-ttt.js"></script>
+    <script src="js/games/color-ttt.js"></script>
+    <script src="js/games/snakes-ladders.js"></script>
+    <script src="js/games/memory-duel.js"></script>
+    <script src="js/games/ultimate-ttt.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+/* Online Setup Styles */
+.online-section {
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-field {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 100%;
+    max-width: 250px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.divider {
+    color: var(--glass-border);
+    margin: 10px 0;
+    font-size: 0.9rem;
+}
